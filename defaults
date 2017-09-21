@@ -1,0 +1,5 @@
+N 2
+L 2 3 4
+TOLERANCE 1E-5
+bc 0 1
+lambda 0.1 1. 2.
