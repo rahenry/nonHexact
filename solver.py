@@ -3,12 +3,6 @@ import matplotlib.pyplot as plt
 
 SIGMA_OFFSET = 0 
 
-def make_ident(c):
-    keys = ['bc', 'N', 'L', 'lambda']
-    res = []
-    for k in keys: res.append(float(c[k]))
-    return tuple(res)
-
 def sigma(i, j, N):
     return (i / (N ** j)) % N
 
@@ -80,7 +74,7 @@ def solve(sol):
     M = N**L # size of hilbert space
     Q = range(M) # indices of all states
 
-    ident = make_ident(sol)
+    ident = writer.make_ident(sol)
 
     X_mapping, X_conj_mapping, Z_mapping = generate_mappings(N, L, gamma, bc)
 

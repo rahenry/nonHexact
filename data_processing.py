@@ -1,9 +1,7 @@
 import numpy, scipy, math, cmath, random, scipy.sparse, scipy.sparse.linalg, scipy.special, sys, struct, os
 import matplotlib.pyplot as plt
-import solver
+import solver, writer
 
-DATA_MARKER_START = '*******'
-DATA_MARKER_END = '___#*$'
 ENCODE_EVECS = False
 
 def is_iterable(x):
@@ -158,12 +156,15 @@ def read_inputs():
             combs = process_combinations(combs, (key, val))
 
         for c in combs:
-            ident = solver.make_ident(c)
+            ident = writer.make_ident(c)
             sols[input_file][ident] = c
             sols[input_file][ident]['ident'] = ident
 
         data_file = input_file + '.data'
-        sols[input_file].update(decode_solutions(data_file))
+        stored_sols = decode_solutions(data_file)
+        for ident, sol in stored_sols.iteritems():
+            if ident in sols[input_file]: sols[input_file][ident] = sol
+        #sols[input_file].update(decode_solutions(data_file))
         #print decode_solutions(data_file)
 
         #for ident, s in sols[input_file].iteritems():
