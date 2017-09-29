@@ -5,13 +5,16 @@ import solver, data_processing
 SORTING_SCHEME_DEFAULT = ['bc', 'L', 'N', 'gamma']
 SORTING_SCHEME_DEFAULT = ['L', 'lambda', 'bc']
 OUTPUT_SCHEME_DEFAULT = ['bc', 'lambda', 'L', 'cX_real', 'cX_expected', 'e', 'e_expected']
+OUTPUT_SCHEME_DEFAULT = ['N', 'bc', 'lambda', 'L', 'cX_real', 'e', 'e_infinity']
 FLOAT_PRECISION_DEFAULT = 10
 FLOAT_WIDTH_DEFAULT = 16
 INTEGER_WIDTH_DEFAULT = 6
 OUTPUT_SETTINGS= {
-        'lambda' : {'p1' : 10, 'p2' : 3},
-        'bc' : {'values' : {0 : 'closed', 1 : 'periodic'},
+        'lambda' : {'p1' : 8, 'p2' : 2},
+        'bc' : {'values' : {0 : 'open', 1 : 'periodic'},
             'p1' : 9},
+        'N' : {'p1' : 3},
+        'L' : {'p1' : 4},
         }
 
 def write_any(x, name, p1=None, p2=None):

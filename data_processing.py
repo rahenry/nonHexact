@@ -172,8 +172,9 @@ def read_inputs():
             if 'e' not in s: 
                 print "Solving " + str(ident)
                 solver.solve(s)
-            enc = encode_solution(s)
-            dec = decode_solution(enc)
+            #enc = encode_solution(s)
+            #dec = decode_solution(enc)
+            s['e_infinity'] = solver.exact_eigenvalue(s['L'], s['N'], s['lambda'])
 
         f = open(data_file, 'w+')
         for ident, s in sols[input_file].iteritems():

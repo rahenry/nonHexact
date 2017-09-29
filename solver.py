@@ -161,7 +161,7 @@ def solve(sol):
     sol.update({
         'cZ_expected': cZ_expected(sol),
         'cX_expected': cX_expected(sol),
-        'e_expected' : sol['energy_expected']
+        'e_infinity' : sol['energy_expected']
         })
     
     return sol
@@ -172,12 +172,13 @@ def eps(j, L, N, gamma):
 
 
 def exact_eigenvalue(L, N, gamma):
-    if gamma == 1.:
+    if False:
+    #if gamma == 1.:
         res = 0.0
         for j in range(L):
             res -= eps(j+1, L, N, gamma)
         return res / L
-    if (gamma > 1.):
+    if (gamma >= 1.):
         return -(1+gamma**N)**(1./N) * scipy.special.hyp2f1(-1./2./N, (-1./N+1.)/2., 1., 4.*gamma**N/((1.+gamma**N)**2))
         return -(1.-gamma**N)**(1./N) * scipy.special.hyp2f1(-1./N,1.-1./N,1.,1./(1.-gamma**(-N)))
         return -gamma * scipy.special.hyp2f1(-1./N, -1./N, 1., (1./gamma)**N)
