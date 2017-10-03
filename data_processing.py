@@ -31,7 +31,7 @@ def read_input_file(input_file):
     return res
 
 def encode_data(sol, key):
-    if 'evec' in key: return ''
+    #if 'evec' in key: return ''
     res = ''
     val = sol[key]
     if not is_iterable(val):

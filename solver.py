@@ -1,5 +1,6 @@
 import numpy, scipy, math, cmath, random, scipy.sparse, scipy.sparse.linalg, scipy.special
 import matplotlib.pyplot as plt
+import writer
 
 SIGMA_OFFSET = 0 
 

@@ -1,6 +1,6 @@
 import numpy, scipy, math, cmath, random, scipy.sparse, scipy.sparse.linalg, scipy.special, sys, struct, os, operator
 import matplotlib.pyplot as plt
-import solver, data_processing, writer
+import solver, data_processing, writer, measure
 
 OUTPUT_SCHEME_DEFAULT = writer.OUTPUT_SCHEME_DEFAULT
 SORTING_SCHEME_DEFAULT = writer.SORTING_SCHEME_DEFAULT
@@ -24,3 +24,9 @@ output_file = 'latest_output'
 f = open(output_file, 'w+')
 f.write(output)
 f.close()
+
+
+k = 9.9
+for s in sol_list:
+    if s['L'] != 9: continue
+    print s['ident'], measure.measure_scalar(s, measure.momentum_1, k)

@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 import solver, data_processing
 
 INDEX_KEYS = ['bc', 'N', 'L', 'lambda', 'index']
-SORTING_SCHEME_DEFAULT = ['bc', 'L', 'N', 'gamma']
-SORTING_SCHEME_DEFAULT = ['L', 'lambda', 'bc', 'q1']
+SORTING_SCHEME_DEFAULT = ['gamma', 'bc', 'L', 'N']
+SORTING_SCHEME_DEFAULT = ['L', 'bc', 'lambda', 'q1']
 OUTPUT_SCHEME_DEFAULT = ['bc', 'lambda', 'L', 'cX_real', 'cX_expected', 'e', 'e_expected']
 OUTPUT_SCHEME_DEFAULT = ['N', 'bc', 'lambda', 'L', 'cX_real', 'e', 'e_infinity']
 OUTPUT_SCHEME_DEFAULT = ['L', 'e']
