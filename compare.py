@@ -5,36 +5,57 @@ import solver, writer
 parser = argparse.ArgumentParser()
 parser.add_argument('inputs', nargs = '+')
 args = parser.parse_args(sys.argv[1:])
-POLYFIT_DEGREE = 5
-POLYFIT_INF = 1000
+POLYFIT_DEGREE = 2
+POLYFIT_INF = 1000000
+N_POINTS = 12
+POLYFIT_STYLE = 3
 
 def diff_function(x, y):
     return abs(x-y)/(abs(x)+abs(y))
 
-def expfit_func(x, a, b, c):
-    return a * numpy.exp(-b * x) + c
+def fit_func_2(x, a, b, c, d):
+    #return a + abs(b * (x)**c)
+    return a + b * (x)**c
+    return a + b * (x)**c + d * x ** (2.*c)
+    return a + -abs(b * (x)**c) - abs(d * x ** (2.*c))
 
-def expfit_series(sols, key):
+def fit_func_3(x, a, b, c, d, e):
+    return a + b * x**(5./3.)
+    return a - abs(b*x**1) - abs(c*x**2) - abs(d*x**3) - abs(e*x**4)
+    return a - abs(b*x**1) - abs(c*x**2)
+    return a - abs(b*x**1)
+
+
+def polyfit_series_new(sols, key):
     data = []
-    for s in sols[-10:]:
-        data.append(s[key])
-
-    popt, pcov = scipy.optimize.curve_fit(expfit_func, range(len(data)), data)
-    return popt
-
-def polyfit_series(sols, key):
-    data = []
+    xdata = []
+    xkey = 'L'
     for s in sols:
+        if 'L' in s: xdata.append(s['L'] ** -1.)
+        else: xdata.append((s['index']) ** -1.)
         data.append(s[key])
 
-    fit = numpy.polyfit(range(len(data)), data, POLYFIT_DEGREE)
-    return fit
+    xdata = xdata[-N_POINTS:]
+    data = data[-N_POINTS:]
+    if POLYFIT_STYLE == 1:
+        return numpy.polyfit(xdata, data, POLYFIT_DEGREE)
+    if POLYFIT_STYLE == 2:
+        return scipy.optimize.curve_fit(fit_func_2, xdata, data)[0]
+    if POLYFIT_STYLE == 3:
+        return scipy.optimize.curve_fit(fit_func_3, xdata, data)[0]
 
 def extrapolate(sols, key):
     if key in writer.INDEX_KEYS:
         return 'inf'
-    fit = expfit_series(sols, key)
-    return expfit_func(POLYFIT_INF, *fit)
+
+    fit = polyfit_series_new(sols, key)
+    if POLYFIT_STYLE == 1:
+        return numpy.polyval(fit, POLYFIT_INF ** -1.)
+    if POLYFIT_STYLE == 2:
+        return fit_func_2(POLYFIT_INF**-1., *fit)
+    if POLYFIT_STYLE == 3:
+        return fit_func_3(POLYFIT_INF**-1., *fit)
+
 
 def is_numeric(s):
     numtypes = [int, float]
@@ -128,12 +149,16 @@ def compare_files(file_list):
     for sol in sol_list:
         res += sol['output'] + '\n'
 
-    sol_extrapolated = {}
-    for s in output_scheme:
-        sol_extrapolated[s] = extrapolate(sol_list, s)
     print res
+    #return
     #print sol_extrapolated
-    #print writer.generate_output(sol_extrapolated, output_scheme)
+    for n in range(5, 21):
+        global N_POINTS
+        N_POINTS = n
+        sol_extrapolated = {}
+        for s in output_scheme:
+            sol_extrapolated[s] = extrapolate(sol_list, s)
+        print writer.generate_output(sol_extrapolated, output_scheme)
 
 if len(args.inputs) > 1:
     compare_files(args.inputs)
