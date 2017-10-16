@@ -166,6 +166,11 @@ def eps(j, L, N, gamma):
     return pow(1. + gamma**N + 2.*(gamma**(.5*N)) * math.cos(kj), 1./N)
 
 
+def exact_eig2(L, N, gamma):
+    res = 0.0
+    for j in range(L):
+        res -= eps(j+1, L, N, gamma)
+    return res / L
 def exact_eigenvalue(L, N, gamma):
     if False:
     #if gamma == 1.:
