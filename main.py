@@ -19,6 +19,7 @@ sol_list = writer.sort_sols(sol_list, SORTING_SCHEME_DEFAULT)
 output = header
 for s in sol_list:
     output += '\n' + s['output']
+output += '\n'
 
 output_file = 'latest_output'
 f = open(output_file, 'w+')

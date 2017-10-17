@@ -65,6 +65,10 @@ def generate_mappings(N, L, gamma, bc):
         Z_mapping.append(Z_coef)
     return (X_mapping, X_conj_mapping, Z_mapping)
 
+def CPSI_factor(r, N):
+    u = numpy.exp(math.pi * 1.J * (2*r-N)/2/N)/numpy.sin(math.pi*r/N)
+    return u
+
 def solve(sol):
     N = sol['N']
     L = sol['L']
@@ -85,19 +89,43 @@ def solve(sol):
     data = []
     count = 0
 
-    for i in Q:
-        rows.append(i)
-        cols.append(i)
-        data.append(-gamma * Z_mapping[i])
-
-        for x in range(L):
-            j = X_mapping[x][i]
+    MODEL = 'CPSI'
+    R = range(1, N)
+    if (MODEL == 'CPSI'):
+        for i in Q:
             rows.append(i)
-            cols.append(j)
-            data.append(-1)
-    #print "Data created, building matrix..."
+            cols.append(i)
+            x = 0.
+            for r in R:
+                u = CPSI_factor(r, N)
+                x -= gamma * u * (Z_mapping[i] ** r)
+            data.append(x)
+
+            for j in range(L):
+                for r in R:
+                    k = i
+                    z = 0
+                    while (z < r):
+                        k = X_mapping[j][k]
+                        z += 1
+                    rows.append(i)
+                    cols.append(k)
+                    data.append(-CPSI_factor(r, N))
+
+
+    else:
+
+        for i in Q:
+            rows.append(i)
+            cols.append(i)
+            data.append(-gamma * Z_mapping[i])
+
+            for x in range(L):
+                j = X_mapping[x][i]
+                rows.append(i)
+                cols.append(j)
+                data.append(-1)
     m = scipy.sparse.coo_matrix((data, (rows, cols)), (M, M))
-    #print "Matrix built, starting diag..."
 
     e = scipy.sparse.linalg.eigs(m, k=2, maxiter = 10000000, tol=TOLERANCE, which='SR')
 
