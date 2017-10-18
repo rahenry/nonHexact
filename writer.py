@@ -2,15 +2,20 @@ import numpy, scipy, math, cmath, random, scipy.sparse, scipy.sparse.linalg, sci
 import matplotlib.pyplot as plt
 import solver, data_processing
 
-INDEX_KEYS = ['bc', 'N', 'L', 'lambda', 'index']
+INDEX_KEYS = ['bc', 'N', 'L', 'lambda', 'index', 'model']
 SORTING_SCHEME_DEFAULT = ['gamma', 'bc', 'L', 'N']
 SORTING_SCHEME_DEFAULT = ['L', 'bc', 'lambda', 'q1']
 OUTPUT_SCHEME_DEFAULT = ['bc', 'lambda', 'L', 'cX_real', 'cX_expected', 'e', 'e_expected']
 OUTPUT_SCHEME_DEFAULT = ['L', 'e']
-OUTPUT_SCHEME_DEFAULT = ['N', 'bc', 'lambda', 'L', 'cX_real', 'e', 'e_infinity']
-FLOAT_PRECISION_DEFAULT = 16
-FLOAT_WIDTH_DEFAULT = 26
+OUTPUT_SCHEME_DEFAULT = ['N', 'bc', 'lambda', 'L', 'cX_real', 'cX_imag', 'e', 'e_infinity']
+OUTPUT_SCHEME_DEFAULT = ['model', 'N', 'bc', 'lambda', 'L', 'cX_real', 'cX_imag', 'cZ_real', 'cZ_imag', 'e', 'e_infinity']
+OUTPUT_SCHEME_DEFAULT = ['model', 'N', 'bc', 'lambda', 'L', 'cX_real', 'cX_imag', 'e', 'e_infinity']
+SORTING_SCHEME_DEFAULT = list(OUTPUT_SCHEME_DEFAULT)
+SORTING_SCHEME_DEFAULT.reverse()
+FLOAT_PRECISION_DEFAULT = 8 #16
+FLOAT_WIDTH_DEFAULT = 14 #26
 INTEGER_WIDTH_DEFAULT = 6
+PRINT_COMPLEX = 1
 OUTPUT_SETTINGS= {
         'lambda' : {'p1' : 8, 'p2' : 2},
         'bc' : {'values' : {0 : 'open', 1 : 'periodic'},
@@ -18,6 +23,7 @@ OUTPUT_SETTINGS= {
         'N' : {'p1' : 3},
         'L' : {'p1' : 4},
         'index' : {'p1' : 4},
+        'model' : {'p1' : 5},
         }
 
 def write_any(x, name, p1=None, p2=None):
@@ -32,7 +38,10 @@ def write_any(x, name, p1=None, p2=None):
     dtype = 'i'
     just = ''
     if isinstance(x, complex):
-        x = x.real
+        if 'imag' in name.lower():
+            x = x.imag
+        else:
+            x = x.real
     if isinstance(x, int):
         if not p1: p1 = INTEGER_WIDTH_DEFAULT
         dtype = 'i'
@@ -84,7 +93,10 @@ def generate_header(s, scheme):
 def sort_sols(sol_list, scheme):
     for x in scheme:
         if x in sol_list[0]:
-            sol_list = sorted(sol_list, key=lambda y: y[x])
+            try:
+                sol_list = sorted(sol_list, key=lambda y: y[x])
+            except TypeError:
+                pass
     return sol_list
 
 def make_ident(c):
@@ -92,6 +104,9 @@ def make_ident(c):
     res = []
     for k in keys: 
         if k in c:
-            res.append(float(c[k]))
+            try:
+                res.append(float(c[k]))
+            except ValueError:
+                res.append(float(hash(c[k]) % 10000))
     return tuple(res)
 

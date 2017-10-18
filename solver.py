@@ -29,7 +29,12 @@ def cX_expected(sol):
     if gamma > 1.: return 0.
     return pow(1. - gamma*gamma, 0.25)
 
-def generate_mappings(N, L, gamma, bc):
+def generate_mappings(sol):
+    N = sol['N']
+    L = sol['L']
+    bc = sol['bc']
+    gamma = sol['lambda']
+
     omega = cmath.exp(2.0 * math.pi * 1.0J / N)
     M = N**L # size of hilbert space
     Q = range(M) # indices of all states
@@ -37,6 +42,7 @@ def generate_mappings(N, L, gamma, bc):
     X_mapping = []
     X_conj_mapping = []
     Z_mapping = []
+
     for j in range(L):
         X_mapping.append([])
         X_conj_mapping.append([])
@@ -56,17 +62,26 @@ def generate_mappings(N, L, gamma, bc):
                 X_conj_mapping[j].append(index(i, j, sigma_j-1, N))
 
         Z_coef = 0.
-        for j in range(L-1):
-            Z_coef += (omega ** (sigma(i, j, N) -SIGMA_OFFSET )) * ((omega ** (sigma(i, j+1, N) - SIGMA_OFFSET)) ** (N-1))
+        R = [1]
+        if sol['model'] == 'SICP':
+            R = range(1, N)
+        for r in R:
+            u = 1.
+            if sol['model'] == 'SICP':
+                u = SICP_factor(r, N)
 
-        if (bc):
-            j = L-1
-            Z_coef += (omega ** (sigma(i, j, N) - SIGMA_OFFSET)) * ((omega ** (sigma(i, 0, N) -SIGMA_OFFSET)) ** (N-1))
+            for j in range(L-1):
+                Z_coef += u * pow((omega ** (sigma(i, j, N) -SIGMA_OFFSET )) * ((omega ** (sigma(i, j+1, N) - SIGMA_OFFSET)) ** (N-1)), r)
+
+            if (bc):
+                j = L-1
+                Z_coef += u * pow((omega ** (sigma(i, j, N) - SIGMA_OFFSET)) * ((omega ** (sigma(i, 0, N) -SIGMA_OFFSET)) ** (N-1)), r)
+
         Z_mapping.append(Z_coef)
     return (X_mapping, X_conj_mapping, Z_mapping)
 
-def CPSI_factor(r, N):
-    u = numpy.exp(math.pi * 1.J * (2*r-N)/2/N)/numpy.sin(math.pi*r/N)
+def SICP_factor(r, N):
+    u = numpy.exp(math.pi * 1.J * (2.*r-N)/2./N)/numpy.sin(math.pi*r/N)
     return u
 
 def solve(sol):
@@ -81,7 +96,7 @@ def solve(sol):
 
     ident = writer.make_ident(sol)
 
-    X_mapping, X_conj_mapping, Z_mapping = generate_mappings(N, L, gamma, bc)
+    X_mapping, X_conj_mapping, Z_mapping = generate_mappings(sol)
 
     s0 = []
     rows = []
@@ -89,16 +104,13 @@ def solve(sol):
     data = []
     count = 0
 
-    MODEL = 'CPSI'
     R = range(1, N)
-    if (MODEL == 'CPSI'):
+    if (sol['model'] == 'SICP'):
         for i in Q:
             rows.append(i)
             cols.append(i)
             x = 0.
-            for r in R:
-                u = CPSI_factor(r, N)
-                x -= gamma * u * (Z_mapping[i] ** r)
+            x -= gamma * (Z_mapping[i])
             data.append(x)
 
             for j in range(L):
@@ -108,9 +120,18 @@ def solve(sol):
                     while (z < r):
                         k = X_mapping[j][k]
                         z += 1
+
+    
+                    Z = 0
+                    K = i
+                    while (Z < r+5):
+                        #print K
+                        K = X_mapping[j][K]
+                        Z += 1
+                    #print '...'
                     rows.append(i)
                     cols.append(k)
-                    data.append(-CPSI_factor(r, N))
+                    data.append(-SICP_factor(r, N))
 
 
     else:
@@ -178,7 +199,7 @@ def solve(sol):
             'bc' : bc,
             #'ident' : ident,
             'e' : min(e[0]) / L,
-            'energy_expected' : exact_eigenvalue(L, N, gamma),
+            'energy_expected' : exact_eigenvalue(sol),
             })
 
     sol.update({
@@ -199,17 +220,27 @@ def exact_eig2(L, N, gamma):
     for j in range(L):
         res -= eps(j+1, L, N, gamma)
     return res / L
-def exact_eigenvalue(L, N, gamma):
+def exact_eigenvalue(sol):
+    L = sol['L']
+    N = sol['N']
+    gamma = sol['lambda']
     if False:
     #if gamma == 1.:
         res = 0.0
         for j in range(L):
             res -= eps(j+1, L, N, gamma)
         return res / L
-    if (gamma >= 1.):
-        return -(1+gamma**N)**(1./N) * scipy.special.hyp2f1(-1./2./N, (-1./N+1.)/2., 1., 4.*gamma**N/((1.+gamma**N)**2))
-        return -(1.-gamma**N)**(1./N) * scipy.special.hyp2f1(-1./N,1.-1./N,1.,1./(1.-gamma**(-N)))
-        return -gamma * scipy.special.hyp2f1(-1./N, -1./N, 1., (1./gamma)**N)
+
+    if sol['model'] == 'SICP':
+        res = 0.
+        for l in range(1, N):
+            res += (1.+gamma) * scipy.special.hyp2f1(-0.5, float(l)/N, 1., 4.*gamma/((1.+gamma)**2.))
+        return -res
     else:
+        if (gamma >= 1.):
+            return -(1+gamma**N)**(1./N) * scipy.special.hyp2f1(-1./2./N, (-1./N+1.)/2., 1., 4.*gamma**N/((1.+gamma**N)**2))
+            return -(1.-gamma**N)**(1./N) * scipy.special.hyp2f1(-1./N,1.-1./N,1.,1./(1.-gamma**(-N)))
+            return -gamma * scipy.special.hyp2f1(-1./N, -1./N, 1., (1./gamma)**N)
+
         return -scipy.special.hyp2f1(-1./N, -1./N, 1., gamma**N)
 

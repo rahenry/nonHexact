@@ -1,0 +1,5 @@
+models = SICP nonH
+L = 4:11
+bc = 0 1
+N = 3
+lambda = 1.0

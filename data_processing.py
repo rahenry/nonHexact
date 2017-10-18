@@ -13,21 +13,29 @@ def read_input_file(input_file):
     for l in f.readlines():
         l = l.split()
         if len(l) == 0: continue
-        res[l[0]] = []
+        name = l[0]
+        if name[-1] == 's': name = name[0:-1]
+        res[name] = []
         for x in l[1:]:
             if x == '=': continue
             if ':' in x:
                 y = x.split(':')
-                res[l[0]] += range(int(y[0]), int(y[1])+1)
+                res[name] += range(int(y[0]), int(y[1])+1)
             else:
                 try: 
-                    res[l[0]].append(int(x))
+                    res[name].append(int(x))
                     continue
                 except ValueError: pass
                 try: 
-                    res[l[0]].append(float(x))
+                    res[name].append(float(x))
                     continue
-                except ValueError: res[l[0]].append(x)
+                except ValueError: res[name].append(x)
+    return res
+
+def encode_string(s):
+    res = ''
+    res += struct.pack('q', len(s))
+    res += s
     return res
 
 def encode_data(sol, key):
@@ -39,8 +47,13 @@ def encode_data(sol, key):
     for v in val:
         if isinstance(v, complex):
             return ''
-    res += struct.pack('q', len(key))
-    res += key
+    res += encode_string(key)
+    #res += struct.pack('q', len(key))
+    #res += key
+    if isinstance(val[0], str): 
+        res += '2'
+        res += encode_string(val[0])
+        return res
     if isinstance(val[0], int): res += '0'
     else: res+= '1'
 
@@ -110,13 +123,21 @@ def decode_solution(d):
 
         flag = d[index+8+name_len]
         if flag == '0': dtype = 'q'
-        else: dtype = 'd'
+        elif flag == '1': dtype = 'd'
+        elif flag == '2': dtype = 's'
 
-        data_len = struct.unpack('q', subdata[9+name_len:17+name_len])[0]
-        n_data = data_len / 8
-        res[name] = struct.unpack(dtype * n_data, subdata[17+name_len:17+name_len+data_len])
 
-        if n_data == 1: 
+        if dtype == 's':
+            data_len = struct.unpack('q', subdata[9+name_len:9+name_len+8])[0]
+            data = subdata[17+name_len:17+name_len+data_len]
+            res[name] = data
+
+        else:
+            data_len = struct.unpack('q', subdata[9+name_len:17+name_len])[0]
+            n_data = data_len / 8
+            res[name] = struct.unpack(dtype * n_data, subdata[17+name_len:17+name_len+data_len])
+
+        if n_data == 1 and not dtype == 's':
             res[name] = res[name][0]
 
         index += 17+name_len+data_len
@@ -139,8 +160,10 @@ def process_combinations(old, new):
     res = []
     for x in old:
         for y in new[1]:
+            name = new[0]
+            if name[-1] == 's': name = name[0:-1]
             res.append(dict(x))
-            res[-1][new[0]] = y
+            res[-1][name] = y
     return res
 
 def read_inputs():
@@ -175,7 +198,7 @@ def read_inputs():
                 solver.solve(s)
             #enc = encode_solution(s)
             #dec = decode_solution(enc)
-            s['e_infinity'] = solver.exact_eigenvalue(s['L'], s['N'], s['lambda'])
+            s['e_infinity'] = solver.exact_eigenvalue(s)
 
         f = open(data_file, 'w+')
         for ident, s in sols[input_file].iteritems():
