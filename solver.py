@@ -149,6 +149,9 @@ def solve(sol):
     m = scipy.sparse.coo_matrix((data, (rows, cols)), (M, M))
 
     e = scipy.sparse.linalg.eigs(m, k=2, maxiter = 10000000, tol=TOLERANCE, which='SR')
+    #e = scipy.sparse.linalg.eigs(m, k=5, maxiter = 100000, tol=1E-2, which='SM')
+    #for q in e[0]:
+        #print q
 
     evec_ind = 0
     if (e[0][1] < e[0][0]): evec_ind = 1
