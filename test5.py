@@ -86,8 +86,8 @@ ydata = []
 for e in eigs:
     xdata.append(e.real)
     ydata.append(e.imag)
-plt.plot(xdata, ydata, linestyle='', marker='o')
-plt.show()
+#plt.plot(xdata, ydata, linestyle='', marker='o')
+#plt.show()
 
 sol_list = [0]
 print eps_list
@@ -107,7 +107,7 @@ for e in sol_list:
     xdata.append(-e.real)
     ydata.append(-e.imag)
 #print sol_list
-#plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
-#plt.axes().set_aspect('equal', 'datalim')
-#plt.show()
+plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
+plt.axes().set_aspect('equal', 'datalim')
+plt.show()
 
