@@ -5,9 +5,12 @@ import solver, data_processing, writer, measure
 def omega(j):
     return numpy.exp(2.*math.pi*1.J*j/N)
 N = 3
-L = 6
+L = 10
 beta = (1-omega(1))**(N-1) / (1-omega(N-1))
 beta = 1.
+beta = omega(1)
+beta1 = omega(1)*0
+beta2 = -omega(2)
 shift = 1
 s = N*L
 g = 1.
@@ -21,14 +24,11 @@ def m_element_P(i, j, s, bc):
     if d == -1: return 1.
     if bc == 1: 
         d = d % s
-    if d > 8:
-        print (i, j, d)
-        print d % s
     if d == s-1:
-        if j == s-1: return gamma
+        if j == s-1: return beta1
     if d == N-1: 
         z = gamma
-        if j == 0: z *= beta
+        if j == 0: z *= beta2
         if j % N == 0: return z
         if j % N == N-1: return z
         #if j % N == 1 or i % N == 1: return gamma
