@@ -188,10 +188,7 @@ def read_inputs():
         for ident, sol in stored_sols.iteritems():
             if ident in sols[input_file]: sols[input_file][ident] = sol
         #sols[input_file].update(decode_solutions(data_file))
-        #print decode_solutions(data_file)
 
-        #for ident, s in sols[input_file].iteritems():
-            #for x in s: print x
         for ident, s in sols[input_file].iteritems():
             if 'e' not in s: 
                 print "Solving " + str(ident)
