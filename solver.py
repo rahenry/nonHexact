@@ -146,9 +146,16 @@ def solve(sol):
                 rows.append(i)
                 cols.append(j)
                 data.append(-1)
-    m = scipy.sparse.coo_matrix((data, (rows, cols)), (M, M))
 
-    e = scipy.sparse.linalg.eigs(m, k=2, maxiter = 10000000, tol=TOLERANCE, which='SR')
+    e = []
+    if sol['eig_method'] == 'sparse':
+        m = scipy.sparse.coo_matrix((data, (rows, cols)), (M, M))
+        e = scipy.sparse.linalg.eigs(m, k=2, maxiter = 10000000, tol=TOLERANCE, which='SR')
+    else:
+        m = numpy.zeros((M,M), dtype=numpy.complex_)
+        for (i,j,d) in zip(rows, cols, data):
+            m[i, j] = d
+        e = scipy.linalg.eig(m)
     #e = scipy.sparse.linalg.eigs(m, k=5, maxiter = 100000, tol=1E-2, which='SM')
     #for q in e[0]:
         #print q
@@ -203,6 +210,7 @@ def solve(sol):
             #'ident' : ident,
             'e' : min(e[0]) / L,
             'energy_expected' : exact_eigenvalue(sol),
+            'eigenvalues' : e[0],
             })
 
     sol.update({

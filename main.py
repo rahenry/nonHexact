@@ -64,6 +64,15 @@ for sol in sol_list:
         res += '%9.2E' % se.real + ' '
         total += se
 
+    if sol['eig_method'] == 'full':
+        xdata = []
+        ydata = []
+        for e in sol['eigenvalues']:
+            xdata.append(e.real)
+            ydata.append(e.imag)
+        plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
+        plt.axes().set_aspect('equal', 'datalim')
+        plt.show()
     div = L
     if sol['bc'] == 0 : div += 1
     print L, sol['bc'], sol['lambda'], ' | ', total.real / div

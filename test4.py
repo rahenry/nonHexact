@@ -4,7 +4,6 @@ import solver, data_processing, writer, measure
 
 N = 3
 L = 12
-shift = 1
 s = 3*L
 g = 1.
 eps = 0.1
