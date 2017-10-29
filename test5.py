@@ -90,21 +90,31 @@ for e in eigs:
 #plt.plot(xdata, ydata, linestyle='', marker='o')
 #plt.show()
 
-sol_list = [0]
+sol_list = [(0,0)]
 
 for e in eps_list:
     new_list = []
     for s in sol_list:
         for i in range(N):
-            x = s + omega(i) * e
+            charge = s[1] + i
+            x = s[0] + omega(i) * e
             d = 1.0
             q = 1.
             #if not i==0: x -= d + q * 1.J * i
-            new_list.append(x)
+            new_list.append((x, charge))
         #for i in range(N):
             #new_list.append(s + e * numpy.exp(1.9*math.pi*1.J / 2. / N * (i-1)))
     sol_list = new_list
 
+new_list = []
+Q = -0.333
+for s in sol_list:
+    charge = s[1] % N
+    charge = s[1]
+    x = s[0] + Q*charge
+    new_list.append(x)
+
+sol_list = new_list
 print len(sol_list)
 
 xdata = []

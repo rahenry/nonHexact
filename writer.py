@@ -80,14 +80,20 @@ def generate_output(s, scheme):
     res = ''
     for x in scheme:
         if not data_processing.is_iterable(x): x = [x]
-        res += write_any(s[x[0]], x[0], *x[1:])
+        try:
+            res += write_any(s[x[0]], x[0], *x[1:])
+        except KeyError:
+            pass
     return res
 
 def generate_header(s, scheme):
     res = ''
     for x in scheme:
         if not data_processing.is_iterable(x): x = [x]
-        res += write_name(s[x[0]], x[0], *x[1:])
+        try:
+            res += write_name(s[x[0]], x[0], *x[1:])
+        except KeyError:
+            pass
     return res
 
 def sort_sols(sol_list, scheme):
