@@ -1,18 +1,20 @@
 import numpy, scipy, math, cmath, random, scipy.sparse, scipy.sparse.linalg, scipy.special, sys, struct, os, operator
 import matplotlib.pyplot as plt
-import solver, data_processing, writer, measure
+import solver, data_processing, writer, measure, plotting
 
 OUTPUT_SCHEME_DEFAULT = writer.OUTPUT_SCHEME_DEFAULT
 SORTING_SCHEME_DEFAULT = writer.SORTING_SCHEME_DEFAULT
 
-data = data_processing.read_inputs().iteritems()
+data = data_processing.read_inputs()
 header = ''
 sol_list = []
-for input_file, d in data:
+for input_file, d in data.iteritems():
     for ident, s in d.iteritems():
         if header == '': header = writer.generate_header(s, OUTPUT_SCHEME_DEFAULT)
         s['output'] = writer.generate_output(s, OUTPUT_SCHEME_DEFAULT)
         sol_list.append(s)
+
+plotting.plot_eigenvalues(data)
 
 sol_list = writer.sort_sols(sol_list, SORTING_SCHEME_DEFAULT)
 
@@ -59,15 +61,7 @@ for sol in sol_list:
         res += '%9.2E' % se.real + ' '
         total += se
 
-    if sol['eig_method'] == 'full' or sol['eig_method'] == 'sparse_eigs':
-        xdata = []
-        ydata = []
-        for e in sol['eigenvalues']:
-            xdata.append(e.real)
-            ydata.append(e.imag)
-        plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
-        plt.axes().set_aspect('equal', 'datalim')
-        plt.show()
+
     div = L
     if sol['bc'] == 0 : div += 1
     print L, sol['bc'], sol['lambda'], ' | ', total.real / div

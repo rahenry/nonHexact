@@ -18,7 +18,7 @@ INTEGER_WIDTH_DEFAULT = 6
 PRINT_COMPLEX = 1
 OUTPUT_SETTINGS= {
         'lambda' : {'p1' : 8, 'p2' : 2},
-        'bc' : {'values' : {0 : 'open', 1 : 'periodic'},
+        'bc' : {'values' : {0 : 'open', 1 : 'periodic', 2 : 'twisted'},
             'p1' : 9},
         'N' : {'p1' : 3},
         'L' : {'p1' : 4},
@@ -26,7 +26,7 @@ OUTPUT_SETTINGS= {
         'model' : {'p1' : 5},
         }
 
-def write_any(x, name, p1=None, p2=None):
+def write_any(x, name, p1=None, p2=None, justify_left=False):
     if data_processing.is_iterable(x): x = x[0]
     if name in OUTPUT_SETTINGS:
         ost = OUTPUT_SETTINGS[name]
@@ -53,13 +53,14 @@ def write_any(x, name, p1=None, p2=None):
     if isinstance(x, str):
         dtype = 's'
         just = '+'
+    if justify_left: just = '-'
     z = '%' + just + str(p1) + dtype
     if isinstance(x, float):
-        z = '%' + str(p1) + '.' + str(p2) + dtype
+        z = '%' + just + str(p1) + '.' + str(p2) + dtype
     #print z, n
     return z % x
 
-def write_name(x, n, p1=None):
+def write_name(x, n, p1=None, justify_left=False):
     if n in OUTPUT_SETTINGS:
         ost = OUTPUT_SETTINGS[n]
         if 'values' in ost:
@@ -72,7 +73,9 @@ def write_name(x, n, p1=None):
     if isinstance(x, float):
         if not p1: p1 = FLOAT_WIDTH_DEFAULT
     if not p1: p1 = FLOAT_WIDTH_DEFAULT
-    z = '%' + str(p1) + 's'
+    z = '%'
+    if justify_left: z += '-'
+    z = z + str(p1) + 's'
     #print z, n
     return z % n
 
