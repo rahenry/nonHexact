@@ -91,7 +91,7 @@ def generate_mappings(sol):
             if (bc == 1 or bc == 2):
                 j = L-1
                 g = 1.0
-                if bc == 2: g = -1.
+                if bc == 2: g = omega
                 Z_coef += g * u * pow((omega ** (sigma(i, j, N) - SIGMA_OFFSET)) * ((omega ** (sigma(i, 0, N) -SIGMA_OFFSET)) ** (N-1)), r)
 
         Z_mapping.append(Z_coef)
@@ -233,7 +233,39 @@ def solve(sol):
             cX += bra[i] * ket[i]
 
 
-    print min(e[0])
+    ind = 0
+    for x in e[0]:
+        if abs(x) < 1E-5:
+        #if ind == 0:
+            xdata = []
+            ydata = []
+            for y in e[1][ind]:
+                xdata.append(y.real)
+                ydata.append(y.imag)
+            plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
+            plt.axes().set_aspect('equal', 'datalim')
+            print x
+            print e[1][ind]
+            #plt.show()
+
+            break
+        ind += 1
+
+    plt.clf()
+    ind = 0
+    xdata = []
+    ydata = []
+    for x in e[0]:
+        if abs(x) < 1E-5:
+        #if ind == 0:
+            print x
+            for y in e[1][ind]:
+                xdata.append(y.real)
+                ydata.append(y.imag)
+        ind += 1
+    plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
+    plt.axes().set_aspect('equal', 'datalim')
+    plt.show()
     sol.update({
             'energy' : min(e[0]),
             'evec' : evec,

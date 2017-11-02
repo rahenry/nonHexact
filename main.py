@@ -14,7 +14,8 @@ for input_file, d in data.iteritems():
         s['output'] = writer.generate_output(s, OUTPUT_SCHEME_DEFAULT)
         sol_list.append(s)
 
-plotting.plot_eigenvalues(data)
+#plotting.plot_eigenvalues(data)
+
 
 sol_list = writer.sort_sols(sol_list, SORTING_SCHEME_DEFAULT)
 
