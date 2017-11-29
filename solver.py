@@ -235,6 +235,7 @@ def solve(sol):
 
     ind = 0
     for x in e[0]:
+        break
         if abs(x) < 1E-5:
         #if ind == 0:
             xdata = []
@@ -244,8 +245,8 @@ def solve(sol):
                 ydata.append(y.imag)
             plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
             plt.axes().set_aspect('equal', 'datalim')
-            print x
-            print e[1][ind]
+            #print x
+            #print e[1][ind]
             #plt.show()
 
             break
@@ -255,17 +256,21 @@ def solve(sol):
     ind = 0
     xdata = []
     ydata = []
+    count1 = 0
     for x in e[0]:
-        if abs(x) < 1E-5:
+        #print x
+        if abs(x) < 1E-3:
+            count1 += 1
         #if ind == 0:
-            print x
+            #print x
             for y in e[1][ind]:
                 xdata.append(y.real)
                 ydata.append(y.imag)
         ind += 1
+    print 'count1 = ', count1
     plt.plot(xdata, ydata, linestyle='', marker='o', ms=3)
     plt.axes().set_aspect('equal', 'datalim')
-    plt.show()
+    #plt.show()
     sol.update({
             'energy' : min(e[0]),
             'evec' : evec,
